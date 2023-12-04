@@ -3,9 +3,19 @@ name = "zero2prod"
 version = "0.1.0"
 edition = "2021"
 
-[target.x86_64-pc-windows-msvc]
-linker = "rust-lld.exe"
-
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
+[lib]
+path = "src/lib.rs"
+
+[[bin]]
+path = "src/main.rs"
+name = "zero2prod"
+
 [dependencies]
+actix-web = "4"
+config = "0.13.4"
+reqwest = "0.11.22"
+serde = { version = "1", features = ["derive"] }
+sqlx = { version = "0.5.7", features = ["runtime-actix-rustls", "macros", "postgres", "uuid", "chrono", "migrate"] }
+tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
