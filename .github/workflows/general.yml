@@ -4,8 +4,8 @@ on: [push, pull_request]
 
 env:
   CARGO_TERM_COLOR: always
-  SQLX_VERSION: 0.5.7
-  SQLX_FEATURES: "runtime-actix-rustls,macros,postgres,uuid,chrono,migrate"
+  SQLX_VERSION: 0.7.1
+  SQLX_FEATURES: "rustls,postgres"
 
 jobs:
   test:
@@ -26,13 +26,15 @@ jobs:
       - name: Rust Cache action
         uses: Swatinem/rust-cache@v2
         with:
-          - key: sqlx-${{ env.SQLX_VERSION }}
+          key: sqlx-${{ env.SQLX_VERSION }}
       - name: Install sqlx cli
         run: cargo install sqlx-cli --version=${{ env.SQLX_VERSION }} --features=${{ env.SQLX_FEATURES }} --no-default-features --locked
       - name: Install postgresql-client
         run: sudo apt-get update && sudo apt-get install postgresql-client -y
+      - name: Make script executable
+        run: chmod +x ./scripts/init_database.sh
       - name: Migrate database
-        run: ./scripts/init_database.sh
+        run: SKIP_DOCKER=true ./scripts/init_database.sh
       - name: Run tests
         run: cargo test
 
@@ -67,13 +69,15 @@ jobs:
       - name: Rust Cache action
         uses: Swatinem/rust-cache@v2
         with:
-          - key: sqlx-${{ env.SQLX_VERSION }}
+          key: sqlx-${{ env.SQLX_VERSION }}
       - name: Install sqlx cli
         run: cargo install sqlx-cli --version=${{ env.SQLX_VERSION }} --features=${{ env.SQLX_FEATURES }} --no-default-features --locked
       - name: Install postgresql-client
         run: sudo apt-get update && sudo apt-get install postgresql-client -y
+      - name: Make script executable
+        run: chmod +x ./scripts/init_database.sh
       - name: Migrate database
-        run: ./scripts/init_database.sh
+        run: SKIP_DOCKER=true ./scripts/init_database.sh
       - name: Linting
         run: cargo clippy -- -D warnings
 
@@ -89,22 +93,26 @@ jobs:
           POSTGRES_DB: newsletter
         ports:
           - 5435:5432
-    container:
-      image: xd009642/tarpaulin
-      options: --security-opt seccomp=unconfined
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+      - uses: dtolnay/rust-toolchain@stable
       - name: Rust Cache action
         uses: Swatinem/rust-cache@v2
         with:
-          - key: sqlx-${{ env.SQLX_VERSION }}
-      - name: Install sqlx cli
-        run: cargo install sqlx-cli --version=${{ env.SQLX_VERSION }} --features=${{ env.SQLX_FEATURES }} --no-default-features --locked
+          key: sqlx-${{ env.SQLX_VERSION }}
       - name: Install postgresql-client
         run: sudo apt-get update && sudo apt-get install postgresql-client -y
+      - name: Install sqlx-cli
+        run:
+          cargo install sqlx-cli
+          --version=${{ env.SQLX_VERSION }}
+          --features ${{ env.SQLX_FEATURES }}
+          --no-default-features
+          --locked
+      - name: Make script executable
+        run: chmod +x ./scripts/init_database.sh
       - name: Migrate database
-        run: ./scripts/init_database.sh
+        run: SKIP_DOCKER=true ./scripts/init_database.sh
       - name: Generate code coverage
-        run: |
-          cargo tarpaulin --verbose --workspace
+        run: cargo install cargo-tarpaulin && cargo tarpaulin --verbose --workspace
