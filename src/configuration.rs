@@ -1,20 +1,20 @@
-use config::{Config};
+use config::Config;
 use secrecy::{ExposeSecret, Secret};
 use serde::Deserialize;
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Debug)]
 pub struct Settings {
     pub database: DatabaseSettings,
-    pub application: ApplicationSettings
+    pub application: ApplicationSettings,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Debug)]
 pub struct ApplicationSettings {
     pub port: u16,
     pub host: String,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Debug)]
 pub struct DatabaseSettings {
     pub username: String,
     pub password: Secret<String>,
@@ -47,12 +47,13 @@ impl DatabaseSettings {
 }
 
 pub fn get_configuration() -> Result<Settings, config::ConfigError> {
-        let environment = std::env::var("APP_ENVIRONMENT")
-        .unwrap_or_else(|_| "local".into());
+    let environment = std::env::var("APP_ENVIRONMENT").unwrap_or_else(|_| "local".into());
 
     let settings: Settings = Config::builder()
         .add_source(config::File::with_name("configuration/default").required(true))
-        .add_source(config::File::with_name(&format!("configuration/{}", environment)).required(true))
+        .add_source(
+            config::File::with_name(&format!("configuration/{}", environment)).required(true),
+        )
         .build()?
         .try_deserialize()?;
 
