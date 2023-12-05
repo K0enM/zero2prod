@@ -1,4 +1,3 @@
-
 use tracing::dispatcher::set_global_default;
 use tracing::Subscriber;
 use tracing_bunyan_formatter::{BunyanFormattingLayer, JsonStorageLayer};
