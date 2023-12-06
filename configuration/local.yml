@@ -1,5 +1,2 @@
-database:
-  host: "postgres"
-  port: 5432
 application:
   host: 127.0.0.1
