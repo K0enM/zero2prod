@@ -2,25 +2,35 @@ use config::Config;
 use secrecy::{ExposeSecret, Secret};
 use serde::Deserialize;
 
-#[derive(Deserialize, Debug)]
+use crate::domain::SubscriberEmail;
+
+#[derive(Deserialize, Debug, Clone)]
 pub struct Settings {
     pub database: DatabaseSettings,
     pub application: ApplicationSettings,
+    pub email_client: EmailClientSettings,
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Debug, Clone)]
 pub struct ApplicationSettings {
     pub port: u16,
     pub host: String,
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Debug, Clone)]
 pub struct DatabaseSettings {
     pub username: String,
     pub password: Secret<String>,
     pub port: u16,
     pub host: String,
     pub database_name: String,
+}
+
+#[derive(Deserialize, Debug, Clone)]
+pub struct EmailClientSettings {
+    pub base_url: String,
+    pub sender_email: String,
+    pub timeout_milliseconds: u64,
 }
 
 impl DatabaseSettings {
@@ -58,4 +68,14 @@ pub fn get_configuration() -> Result<Settings, config::ConfigError> {
         .try_deserialize()?;
 
     Ok(settings)
+}
+
+impl EmailClientSettings {
+    pub fn sender(&self) -> Result<SubscriberEmail, String> {
+        SubscriberEmail::parse(self.sender_email.clone())
+    }
+
+    pub fn timeout(&self) -> std::time::Duration {
+        std::time::Duration::from_millis(self.timeout_milliseconds)
+    }
 }
