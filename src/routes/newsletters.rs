@@ -2,12 +2,8 @@ use actix_web::{web, HttpResponse, ResponseError};
 use anyhow::Context;
 use reqwest::StatusCode;
 use sqlx::PgPool;
-use tracing::Subscriber;
 
-use crate::{
-    domain::SubscriberEmail,
-    email_client::{self, EmailClient},
-};
+use crate::{domain::SubscriberEmail, email_client::EmailClient};
 
 #[derive(serde::Deserialize)]
 pub struct BodyData {
