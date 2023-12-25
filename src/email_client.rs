@@ -2,6 +2,7 @@ use reqwest::Client;
 
 use crate::domain::SubscriberEmail;
 
+#[derive(Debug)]
 pub struct EmailClient {
     http_client: Client,
     base_url: String,
@@ -68,7 +69,7 @@ mod tests {
     use wiremock::matchers::{any, header, method, path};
     use wiremock::{Mock, MockServer, ResponseTemplate};
 
-    use crate::domain::{SubscriberEmail};
+    use crate::domain::SubscriberEmail;
     use crate::email_client::EmailClient;
 
     struct SendEmailBodyMatcher;
