@@ -86,7 +86,6 @@ impl TestApp {
 
 impl TestUser {
     pub fn generate() -> Self {
-        
         Self {
             user_id: Uuid::new_v4(),
             username: Uuid::new_v4().to_string(),
