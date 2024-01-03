@@ -86,12 +86,12 @@ impl TestApp {
 
 impl TestUser {
     pub fn generate() -> Self {
-        let test_user = Self {
+        
+        Self {
             user_id: Uuid::new_v4(),
             username: Uuid::new_v4().to_string(),
             password: Uuid::new_v4().to_string(),
-        };
-        test_user
+        }
     }
 
     async fn store(&self, pool: &PgPool) {
