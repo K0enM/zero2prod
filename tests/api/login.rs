@@ -1,7 +1,3 @@
-
-
-
-
 use crate::helpers::{assert_is_redirect_to, spawn_app};
 
 #[tokio::test]
